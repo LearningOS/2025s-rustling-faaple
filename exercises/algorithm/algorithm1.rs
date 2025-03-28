@@ -2,7 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -23,20 +22,21 @@ impl<T> Node<T> {
     }
 }
 #[derive(Debug)]
-struct LinkedList<T> {
+struct LinkedList<T: Clone + Ord> {
     length: u32,
     start: Option<NonNull<Node<T>>>,
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T: Clone + Ord> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T: Clone + Ord> LinkedList<T> {
     pub fn new() -> Self {
+        println!("new!!!!");
         Self {
             length: 0,
             start: None,
@@ -71,16 +71,40 @@ impl<T> LinkedList<T> {
     }
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
 	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+		let mut merged_list = LinkedList::<T>::default();
+        let mut ptr_a = list_a.start;
+        let mut ptr_b = list_b.start;
+
+        while let (Some(node_a), Some(node_b)) = (ptr_a, ptr_b) {
+            unsafe {
+                if node_a.as_ref().val < node_b.as_ref().val {
+                    merged_list.add(node_a.as_ref().val.clone());
+                    ptr_a = node_a.as_ref().next;
+                } else {
+                    merged_list.add(node_b.as_ref().val.clone());
+                    ptr_b = node_b.as_ref().next;
+                }
+            }
         }
+
+        while let Some(node_a) = ptr_a {
+            unsafe {
+                merged_list.add(node_a.as_ref().val.clone());
+                ptr_a = node_a.as_ref().next;
+            }
+        }
+        while let Some(node_b) = ptr_b {
+            unsafe {
+                merged_list.add(node_b.as_ref().val.clone());
+                ptr_b = node_b.as_ref().next;
+            }
+        }
+
+        merged_list
 	}
 }
 
-impl<T> Display for LinkedList<T>
+impl<T: Clone + Ord> Display for LinkedList<T>
 where
     T: Display,
 {
