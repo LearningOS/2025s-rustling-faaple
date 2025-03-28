@@ -37,7 +37,18 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.items.push(value);
+        self.count += 1;
+        let mut i = self.count;
+        let mut p = self.parent_idx(i);
+
+        while i != 1 {
+            let (left, right) = self.items.split_at_mut(i);
+            if !(self.comparator)(&right[0], &left[p]) { return; }
+            std::mem::swap(&mut left[p], &mut right[0]);
+            i = p;
+            p = self.parent_idx(p);
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +68,7 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+		1
     }
 }
 
@@ -84,8 +94,45 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        let size = &self.len();
+        match size {
+            0 => return None,
+            1 => {
+                self.count -= 1;
+                return self.items.pop();
+            }
+            _ => ()
+        }
+        let (left0, right0) = self.items.split_at_mut(2);
+        std::mem::swap(&mut left0[1], &mut right0[size - 2]);
+        self.count -= 1;
+        let result = self.items.pop();
+
+        let mut i = 1;
+        let mut smallest = 1;
+
+        // heapify
+        while self.children_present(i) {
+            let l = self.left_child_idx(i);
+            let r = self.right_child_idx(i);
+
+            let (left1, right1) = self.items.split_at_mut(l);
+            if (self.comparator)(&right1[0], &left1[i]) { 
+                std::mem::swap(&mut right1[0], &mut left1[i]);
+                smallest = l; 
+            }
+
+            if r <= self.count {
+                let (left2, right2) = self.items.split_at_mut(r);
+                if (self.comparator)(&right2[0], &left2[smallest]) { 
+                    std::mem::swap(&mut right2[0], &mut left2[smallest]);
+                    smallest = r; 
+                }
+            }
+            if (i == smallest) { return result; }
+            i = smallest;
+        }
+        result
     }
 }
 
