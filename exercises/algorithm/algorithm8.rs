@@ -54,28 +54,45 @@ impl<T> Default for Queue<T> {
 
 pub struct myStack<T>
 {
-	//TODO
+    cur:bool,
 	q1:Queue<T>,
 	q2:Queue<T>
 }
 impl<T> myStack<T> {
     pub fn new() -> Self {
         Self {
-			//TODO
+            cur:true, // q1
 			q1:Queue::<T>::new(),
 			q2:Queue::<T>::new()
         }
     }
     pub fn push(&mut self, elem: T) {
-        //TODO
+        let q = if self.cur {&mut self.q1} else {&mut self.q2};
+        q.enqueue(elem);
     }
     pub fn pop(&mut self) -> Result<T, &str> {
         //TODO
-		Err("Stack is empty")
+        let q1; let q2;
+        if self.cur {
+            q1 = &mut self.q1; q2 = &mut self.q2;
+        } else {
+            q1 = &mut self.q2; q2 = &mut self.q1;
+        }
+        match q1.size() {
+            0 => Err("Stack is empty"),
+            1 => q1.dequeue(),
+            _ => {
+                while (q1.size() > 1) {
+                    if let Ok(n) = q1.dequeue() {q2.enqueue(n)}
+                }
+                self.cur = !self.cur;
+                q1.dequeue()
+            }
+        }
     }
     pub fn is_empty(&self) -> bool {
-		//TODO
-        true
+        let q = if self.cur {&self.q1} else {&self.q2};
+        q.is_empty()
     }
 }
 
