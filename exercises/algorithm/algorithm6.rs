@@ -5,6 +5,7 @@
 
 // I AM NOT DONE
 use std::collections::HashSet;
+use std::collections::VecDeque;
 
 struct Graph {
     adj: Vec<Vec<usize>>, 
@@ -24,6 +25,21 @@ impl Graph {
 
     fn dfs_util(&self, v: usize, visited: &mut HashSet<usize>, visit_order: &mut Vec<usize>) {
         //TODO
+        let mut q: VecDeque<usize> = VecDeque::new();
+        
+        visit_order.push(v);
+        visited.insert(v);
+        q.push_front(v);
+
+        while let Some(cur) = q.pop_front() {
+            for x in &self.adj[cur] {
+                if !visited.contains(x) {
+                    visit_order.push(*x);
+                    visited.insert(*x);
+                    q.push_front(*x);
+                }
+            }
+        }
     }
 
     // Perform a depth-first search on the graph, return the order of visited nodes

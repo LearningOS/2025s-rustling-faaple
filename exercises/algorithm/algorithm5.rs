@@ -5,6 +5,7 @@
 
 //I AM NOT DONE
 use std::collections::VecDeque;
+use std::collections::HashSet;
 
 // Define a graph
 struct Graph {
@@ -31,18 +32,18 @@ impl Graph {
 		//TODO
 
         let mut visit_order = vec![];
-        let mut visited = vec![ false; self.adj.len() ];
+        let mut visited = HashSet::new();
         let mut q: VecDeque<usize> = VecDeque::new();
 
         visit_order.push(start);
-        visited[start] = true;
+        visited.insert(start);
         q.push_back(start);
 
         while let Some(cur) = q.pop_front() {
             for x in &self.adj[cur] {
-                if !visited[*x] {
+                if !visited.contains(x) {
                     visit_order.push(*x);
-                    visited[*x] = true;
+                    visited.insert(*x);
                     q.push_back(*x);
                 }
             }
